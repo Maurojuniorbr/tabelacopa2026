@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa do Mundo 2026 · Chaveamento do Mata-mata</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#1a1a2e;
+    --muted:#8a8a99;
+    --line:#e6e6ee;
+    --win-bg:#e1f5ee;
+    --win-ink:#085041;
+    --win-line:#5dcaa5;
+    --gold:#caa64a;
+    --gold-deep:#8a6d1f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  header{text-align:center;padding:22px 16px 6px;}
+  header h1{margin:0;font-size:22px;font-weight:600;letter-spacing:.2px;}
+  header p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+  .toolbar{display:flex;justify-content:center;gap:10px;padding:12px 16px 4px;}
+  .toolbar button{
+    font-size:13px;padding:7px 14px;border:1px solid var(--line);
+    border-radius:8px;background:#fff;cursor:pointer;color:#555;
+    transition:background .12s,border-color .12s;
+  }
+  .toolbar button:hover{background:#f6f6fa;border-color:#d2d2dc;}
+
+  .scroll{overflow-x:auto;padding:6px 16px 36px;}
+  .bracket{
+    display:grid;
+    grid-template-columns:
+      minmax(140px,1fr) minmax(132px,.85fr) minmax(124px,.75fr) minmax(116px,.65fr)
+      136px
+      minmax(116px,.65fr) minmax(124px,.75fr) minmax(132px,.85fr) minmax(140px,1fr);
+    gap:9px;align-items:stretch;min-width:1160px;max-width:1480px;margin:0 auto;
+  }
+  .col{display:flex;flex-direction:column;justify-content:space-around;gap:7px;}
+  .col-head{
+    text-align:center;font-size:10.5px;font-weight:600;text-transform:uppercase;
+    letter-spacing:.5px;color:var(--muted);margin-bottom:5px;min-height:13px;
+  }
+  .match{display:flex;flex-direction:column;gap:3px;flex:1;justify-content:center;}
+  .team{
+    display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 8px;
+    border:1px solid var(--line);border-radius:7px;background:#fff;cursor:pointer;
+    text-align:left;width:100%;transition:background .12s,border-color .12s;
+    white-space:nowrap;overflow:hidden;color:var(--ink);
+  }
+  .col.right .team{flex-direction:row-reverse;text-align:right;}
+  .team:hover:not(.locked-empty){background:#f5faf8;border-color:var(--win-line);}
+  .team img{width:22px;height:15px;object-fit:cover;border-radius:2px;flex-shrink:0;box-shadow:0 0 0 1px rgba(0,0,0,.05);}
+  .team .name{overflow:hidden;text-overflow:ellipsis;}
+  .team.win{background:var(--win-bg);color:var(--win-ink);font-weight:600;border-color:var(--win-line);}
+  .team.lose{opacity:.5;text-decoration:line-through;color:var(--muted);}
+  .team.empty{background:#fafafc;color:var(--muted);cursor:default;}
+  .team.empty img{display:none;}
+
+  .cup{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;}
+  .cup .ring{
+    width:112px;height:112px;border-radius:50%;border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    background:#fff;transition:background .2s,border-color .2s;
+  }
+  .cup.crowned .ring{border-color:var(--gold);background:linear-gradient(180deg,#fdf7e6,#faf0d2);}
+  .cup .trophy{font-size:34px;line-height:1;}
+  .cup .champ-flag{width:32px;height:21px;object-fit:cover;border-radius:3px;margin-top:5px;box-shadow:0 0 0 1px rgba(0,0,0,.08);}
+  .cup .champ-name{font-size:13px;font-weight:600;color:var(--gold-deep);margin-top:3px;min-height:16px;}
+  .cup .champ-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+
+  footer{text-align:center;font-size:11px;color:var(--muted);padding:0 16px 24px;}
+
+  @media print{
+    @page{ size:A4 landscape; margin:8mm; }
+    html,body{width:100%;}
+    header{padding:0 0 4px;}
+    header h1{font-size:16px;}
+    header p{font-size:10px;}
+    .toolbar,footer{display:none !important;}
+    .scroll{overflow:visible;padding:0;}
+    .bracket{
+      min-width:0;width:100%;max-width:100%;gap:5px;
+      grid-template-columns:
+        1fr .9fr .8fr .72fr 118px .72fr .8fr .9fr 1fr;
+    }
+    .team{font-size:9px;padding:3px 5px;gap:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .team img{width:17px;height:11px;}
+    .col-head{font-size:8px;margin-bottom:3px;}
+    .cup .ring{width:86px;height:86px;}
+    .cup .trophy{font-size:26px;}
+    .cup .champ-flag{width:24px;height:16px;}
+    .cup .champ-name{font-size:10px;}
+    .win,.lose,.crowned .ring{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Copa do Mundo 2026 · Mata-mata</h1>
+  <p>Chaveamento oficial FIFA. Clique em uma seleção para classificá-la rumo à taça.</p>
+</header>
+<div class="toolbar">
+  <button id="reset">↺ Reiniciar</button>
+  <button id="print">⎙ Salvar PDF / Imprimir</button>
+</div>
+<div class="scroll">
+  <div class="bracket" id="bracket"></div>
+</div>
+<footer>Chaveamento conforme FIFA após o fim da fase de grupos (28/06/2026). Resultados são simulação do usuário.</footer>
+
+<script>
+(function(){
+  const T = {
+    "África do Sul":"za","Canadá":"ca","Brasil":"br","Japão":"jp",
+    "Costa do Marfim":"ci","Noruega":"no","Inglaterra":"gb-eng","RD Congo":"cd",
+    "Bélgica":"be","Senegal":"sn","Estados Unidos":"us","Bósnia":"ba",
+    "Espanha":"es","Áustria":"at","Suíça":"ch","Argélia":"dz",
+    "Alemanha":"de","Paraguai":"py","Holanda":"nl","Marrocos":"ma",
+    "França":"fr","Suécia":"se","México":"mx","Equador":"ec",
+    "Portugal":"pt","Croácia":"hr","Austrália":"au","Egito":"eg",
+    "Argentina":"ar","Cabo Verde":"cv","Colômbia":"co","Gana":"gh"
+  };
+  function flag(name){const c=T[name];return c?("https://flagcdn.com/"+c.toLowerCase()+".svg"):"";}
+
+  // LADO A (esquerda) — quadrante do Brasil (cima) + quadrante da Argentina (baixo)
+  const LEFT_R16 = [
+    ["Brasil","Japão"],
+    ["Costa do Marfim","Noruega"],
+    ["México","Equador"],
+    ["Inglaterra","RD Congo"],
+    ["Argentina","Cabo Verde"],
+    ["Austrália","Egito"],
+    ["Suíça","Argélia"],
+    ["Colômbia","Gana"]
+  ];
+  // LADO B (direita) — potências europeias
+  const RIGHT_R16 = [
+    ["Alemanha","Paraguai"],
+    ["Holanda","Marrocos"],
+    ["Portugal","Croácia"],
+    ["Espanha","Áustria"],
+    ["França","Suécia"],
+    ["Bélgica","Senegal"],
+    ["Estados Unidos","Bósnia"],
+    ["África do Sul","Canadá"]
+  ];
+
+  const picks = {L:{}, R:{}};
+  const FINAL = {win:null};
+  function k(r,m){return r+"-"+m;}
+
+  function teamAt(side,round,match,slot){
+    const base=side==="L"?LEFT_R16:RIGHT_R16;
+    if(round===0) return base[match][slot];
+    const prev=match*2+slot;
+    return picks[side][k(round-1,prev)]||null;
+  }
+
+  const HEADS=["16-avos","Oitavas","Quartas","Semi"];
+  const COUNT=[8,4,2,1];
+
+  function makeTeam(side,round,match,slot){
+    const name=teamAt(side,round,match,slot);
+    const btn=document.createElement("button");
+    btn.className="team";
+    if(!name){btn.classList.add("empty","locked-empty");btn.innerHTML='<span class="name">—</span>';return btn;}
+    const w=picks[side][k(round,match)];
+    if(w){ if(w===name) btn.classList.add("win"); else btn.classList.add("lose"); }
+    btn.innerHTML='<img src="'+flag(name)+'" alt="" loading="lazy"><span class="name">'+name+'</span>';
+    btn.addEventListener("click",()=>{
+      picks[side][k(round,match)]=name;
+      clearDown(side,round,match);
+      render();
+    });
+    return btn;
+  }
+
+  function clearDown(side,round,match){
+    for(let r=round+1;r<4;r++){
+      const aff=Math.floor(match/Math.pow(2,r-round));
+      delete picks[side][k(r,aff)];
+    }
+    FINAL.win=null;
+  }
+
+  function buildColumn(side,round){
+    const col=document.createElement("div");
+    col.className="col "+(side==="L"?"left":"right");
+    const head=document.createElement("div");
+    head.className="col-head";head.textContent=HEADS[round];
+    col.appendChild(head);
+    for(let m=0;m<COUNT[round];m++){
+      const match=document.createElement("div");match.className="match";
+      match.appendChild(makeTeam(side,round,m,0));
+      match.appendChild(makeTeam(side,round,m,1));
+      col.appendChild(match);
+    }
+    return col;
+  }
+
+  function buildCup(){
+    const lF=picks.L[k(3,0)]||null;
+    const rF=picks.R[k(3,0)]||null;
+    const col=document.createElement("div");col.className="col";
+    const head=document.createElement("div");head.className="col-head";head.textContent="Final";
+    col.appendChild(head);
+    const cup=document.createElement("div");cup.className="cup";
+    const champ=FINAL.win;if(champ)cup.classList.add("crowned");
+
+    const fL=document.createElement("button");fL.className="team";
+    if(lF){
+      if(champ===lF)fL.classList.add("win");else if(champ)fL.classList.add("lose");
+      fL.innerHTML='<img src="'+flag(lF)+'" alt=""><span class="name">'+lF+'</span>';
+      fL.addEventListener("click",()=>{FINAL.win=lF;render();});
+    } else {fL.classList.add("empty","locked-empty");fL.innerHTML='<span class="name">—</span>';}
+
+    const ring=document.createElement("div");ring.className="ring";
+    ring.innerHTML='<div class="trophy">🏆</div>'+
+      (champ?'<img class="champ-flag" src="'+flag(champ)+'" alt="">':'')+
+      '<div class="champ-name">'+(champ||'')+'</div>'+
+      '<div class="champ-label">'+(champ?'Campeão':'a definir')+'</div>';
+
+    const fR=document.createElement("button");fR.className="team";
+    if(rF){
+      if(champ===rF)fR.classList.add("win");else if(champ)fR.classList.add("lose");
+      fR.innerHTML='<img src="'+flag(rF)+'" alt=""><span class="name">'+rF+'</span>';
+      fR.addEventListener("click",()=>{FINAL.win=rF;render();});
+    } else {fR.classList.add("empty","locked-empty");fR.innerHTML='<span class="name">—</span>';}
+
+    cup.appendChild(fL);cup.appendChild(ring);cup.appendChild(fR);
+    col.appendChild(cup);
+    return col;
+  }
+
+  function render(){
+    const b=document.getElementById("bracket");b.innerHTML="";
+    [0,1,2,3].forEach(r=>b.appendChild(buildColumn("L",r)));
+    b.appendChild(buildCup());
+    [3,2,1,0].forEach(r=>b.appendChild(buildColumn("R",r)));
+  }
+
+  document.getElementById("reset").addEventListener("click",()=>{picks.L={};picks.R={};FINAL.win=null;render();});
+  document.getElementById("print").addEventListener("click",()=>window.print());
+  render();
+})();
+</script>
+</body>
+</html>
