@@ -10,11 +10,40 @@
     --ink:#1a1a2e;
     --muted:#8a8a99;
     --line:#e6e6ee;
+    --surface:#ffffff;
+    --surface-2:#f5faf8;
+    --empty-bg:#fafafc;
+    --btn-bg:#ffffff;
+    --btn-ink:#555555;
+    --btn-hover:#f6f6fa;
     --win-bg:#e1f5ee;
     --win-ink:#085041;
     --win-line:#5dcaa5;
+    --ring-bg:#ffffff;
+    --crown-grad-a:#fdf7e6;
+    --crown-grad-b:#faf0d2;
     --gold:#caa64a;
     --gold-deep:#8a6d1f;
+  }
+  html[data-theme="dark"]{
+    --bg:#10131c;
+    --ink:#e7e9f0;
+    --muted:#7d808f;
+    --line:#2a2f3d;
+    --surface:#1a1f2b;
+    --surface-2:#1c3029;
+    --empty-bg:#161a24;
+    --btn-bg:#1a1f2b;
+    --btn-ink:#c4c7d2;
+    --btn-hover:#232838;
+    --win-bg:#10362c;
+    --win-ink:#7fe3c2;
+    --win-line:#2f7a63;
+    --ring-bg:#1a1f2b;
+    --crown-grad-a:#2a2616;
+    --crown-grad-b:#332d18;
+    --gold:#d8b85e;
+    --gold-deep:#e3c878;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;}
@@ -30,10 +59,10 @@
   .toolbar{display:flex;justify-content:center;gap:10px;padding:12px 16px 4px;}
   .toolbar button{
     font-size:13px;padding:7px 14px;border:1px solid var(--line);
-    border-radius:8px;background:#fff;cursor:pointer;color:#555;
+    border-radius:8px;background:var(--btn-bg);cursor:pointer;color:var(--btn-ink);
     transition:background .12s,border-color .12s;
   }
-  .toolbar button:hover{background:#f6f6fa;border-color:#d2d2dc;}
+  .toolbar button:hover{background:var(--btn-hover);border-color:var(--muted);}
 
   .scroll{overflow-x:auto;padding:6px 16px 36px;}
   .bracket{
@@ -52,26 +81,26 @@
   .match{display:flex;flex-direction:column;gap:3px;flex:1;justify-content:center;}
   .team{
     display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 8px;
-    border:1px solid var(--line);border-radius:7px;background:#fff;cursor:pointer;
+    border:1px solid var(--line);border-radius:7px;background:var(--surface);cursor:pointer;
     text-align:left;width:100%;transition:background .12s,border-color .12s;
     white-space:nowrap;overflow:hidden;color:var(--ink);
   }
   .col.right .team{flex-direction:row-reverse;text-align:right;}
-  .team:hover:not(.locked-empty){background:#f5faf8;border-color:var(--win-line);}
+  .team:hover:not(.locked-empty){background:var(--surface-2);border-color:var(--win-line);}
   .team img{width:22px;height:15px;object-fit:cover;border-radius:2px;flex-shrink:0;box-shadow:0 0 0 1px rgba(0,0,0,.05);}
   .team .name{overflow:hidden;text-overflow:ellipsis;}
   .team.win{background:var(--win-bg);color:var(--win-ink);font-weight:600;border-color:var(--win-line);}
   .team.lose{opacity:.5;text-decoration:line-through;color:var(--muted);}
-  .team.empty{background:#fafafc;color:var(--muted);cursor:default;}
+  .team.empty{background:var(--empty-bg);color:var(--muted);cursor:default;}
   .team.empty img{display:none;}
 
   .cup{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;}
   .cup .ring{
     width:112px;height:112px;border-radius:50%;border:2px solid var(--line);
     display:flex;align-items:center;justify-content:center;flex-direction:column;
-    background:#fff;transition:background .2s,border-color .2s;
+    background:var(--ring-bg);transition:background .2s,border-color .2s;
   }
-  .cup.crowned .ring{border-color:var(--gold);background:linear-gradient(180deg,#fdf7e6,#faf0d2);}
+  .cup.crowned .ring{border-color:var(--gold);background:linear-gradient(180deg,var(--crown-grad-a),var(--crown-grad-b));}
   .cup .trophy{font-size:34px;line-height:1;}
   .cup .champ-flag{width:32px;height:21px;object-fit:cover;border-radius:3px;margin-top:5px;box-shadow:0 0 0 1px rgba(0,0,0,.08);}
   .cup .champ-name{font-size:13px;font-weight:600;color:var(--gold-deep);margin-top:3px;min-height:16px;}
@@ -81,6 +110,13 @@
 
   @media print{
     @page{ size:A4 landscape; margin:8mm; }
+    html[data-theme="dark"]{
+      --bg:#fff;--ink:#1a1a2e;--muted:#8a8a99;--line:#e6e6ee;
+      --surface:#fff;--surface-2:#f5faf8;--empty-bg:#fafafc;
+      --win-bg:#e1f5ee;--win-ink:#085041;--win-line:#5dcaa5;
+      --ring-bg:#fff;--crown-grad-a:#fdf7e6;--crown-grad-b:#faf0d2;
+      --gold:#caa64a;--gold-deep:#8a6d1f;
+    }
     html,body{width:100%;}
     header{padding:0 0 4px;}
     header h1{font-size:16px;}
@@ -109,6 +145,7 @@
   <p>Chaveamento oficial FIFA. Clique em uma seleção para classificá-la rumo à taça.</p>
 </header>
 <div class="toolbar">
+  <button id="theme">🌙 Modo escuro</button>
   <button id="reset">↺ Reiniciar</button>
   <button id="print">⎙ Salvar PDF / Imprimir</button>
 </div>
@@ -118,6 +155,21 @@
 <footer>Chaveamento conforme FIFA após o fim da fase de grupos (28/06/2026). Resultados são simulação do usuário.</footer>
 
 <script>
+(function(){
+  const root=document.documentElement;
+  const btn=document.getElementById("theme");
+  function apply(t){
+    root.setAttribute("data-theme",t);
+    btn.textContent = t==="dark" ? "☀️ Modo claro" : "🌙 Modo escuro";
+    try{ localStorage.setItem("copa-theme",t); }catch(e){}
+  }
+  let saved=null;
+  try{ saved=localStorage.getItem("copa-theme"); }catch(e){}
+  if(!saved){ saved = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark":"light"; }
+  apply(saved);
+  btn.addEventListener("click",()=>apply(root.getAttribute("data-theme")==="dark"?"light":"dark"));
+})();
+
 (function(){
   const T = {
     "África do Sul":"za","Canadá":"ca","Brasil":"br","Japão":"jp",
